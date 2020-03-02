@@ -106,6 +106,7 @@ bool q_insert_tail(queue_t *q, char *s)
     memset(newh->value, '\0', strlen(s) + 1);
     strncpy(newh->value, s, strlen(s));
 
+    newh->next = NULL;
     if (!q->head) {
         q->head = newh;
     } else {
