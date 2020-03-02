@@ -5,6 +5,8 @@
 #include "harness.h"
 #include "queue.h"
 
+#include "strnatcmp.h"
+
 /*
  * Create empty queue.
  * Return NULL if could not allocate space.
@@ -218,7 +220,7 @@ list_ele_t *merge(list_ele_t *left, list_ele_t *right)
     list_ele_t *curr;
 
     // Initialize result_head and curr
-    if (strcmp(left->value, right->value) < 0) {
+    if (strnatcmp(left->value, right->value) < 0) {
         result_head = curr = left;
         left = left->next;
     } else {
@@ -227,7 +229,7 @@ list_ele_t *merge(list_ele_t *left, list_ele_t *right)
     }
 
     while (left != NULL && right != NULL) {
-        if (strcmp(left->value, right->value) < 0) {
+        if (strnatcmp(left->value, right->value) < 0) {
             curr->next = left;
             curr = curr->next;
             left = left->next;
