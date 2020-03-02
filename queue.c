@@ -26,18 +26,18 @@ queue_t *q_new()
 /* Free all storage used by queue */
 void q_free(queue_t *q)
 {
-    if (!q) {
+    if (!q)
         return;
+    if (q->size > 0) {
+        list_ele_t *curr = q->head;
+        list_ele_t *prev = NULL;
+        while (curr) {
+            prev = curr;
+            curr = curr->next;
+            free(prev->value);
+            free(prev);
+        }
     }
-
-    list_ele_t *tmp = q->head;
-    while (tmp) {
-        q->head = q->head->next;
-        free(tmp->value);
-        free(tmp);
-        tmp = q->head;
-    }
-
     free(q);
 }
 
@@ -200,6 +200,79 @@ void q_reverse(queue_t *q)
     q->head = curr;
 }
 
+
+list_ele_t *merge(list_ele_t *left, list_ele_t *right)
+{
+    if (!left) {
+        return right;
+    }
+    if (!right) {
+        return left;
+    }
+
+    list_ele_t *result_head;
+    list_ele_t *curr;
+
+    // Initialize result_head and curr
+    if (strcmp(left->value, right->value) < 0) {
+        result_head = curr = left;
+        left = left->next;
+    } else {
+        result_head = curr = right;
+        right = right->next;
+    }
+
+    while (left != NULL && right != NULL) {
+        if (strcmp(left->value, right->value) < 0) {
+            curr->next = left;
+            left = left->next;
+        } else {
+            curr->next = right;
+            right = right->next;
+        }
+    }
+
+    // If there is still node left in 'left list'
+    if (left) {
+        curr->next = left;
+    }
+
+    // If there is still node left in 'right list'
+    if (right) {
+        curr->next = right;
+    }
+
+    return result_head;
+}
+
+list_ele_t *merge_sort(list_ele_t *head)
+{
+    if (!head || !head->next) {
+        return head;
+    }
+
+    /*
+     * Divide nodes of linked list into two halves by slow-fast pointer.
+     * Forward 'fast' by two nodes, and forward 'slow' by one node.
+     */
+    list_ele_t *fast = head->next;
+    list_ele_t *slow = head;
+
+    while (fast != NULL && fast->next != NULL) {
+        fast = fast->next->next;
+        slow = slow->next;
+    }
+
+    list_ele_t *left = head;
+    list_ele_t *right = slow->next;
+    slow->next = NULL;  // To let 'right' know where to end
+
+    left = merge_sort(left);
+    right = merge_sort(right);
+
+    return merge(left, right);
+}
+
 /*
  * Sort elements of queue in ascending order
  * No effect if q is NULL or empty. In addition, if q has only one
@@ -207,6 +280,16 @@ void q_reverse(queue_t *q)
  */
 void q_sort(queue_t *q)
 {
-    /* TODO: You need to write the code for this function */
-    /* TODO: Remove the above comment when you are about to implement. */
+    if (!q || q->size == 0 || q->size == 1) {
+        return;
+    }
+
+    q->head = merge_sort(q->head);
+
+    // Update list tail
+    list_ele_t *tmp = q->head;
+    while (tmp->next != NULL) {
+        tmp = tmp->next;
+    }
+    q->tail = tmp;
 }
