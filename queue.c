@@ -229,9 +229,11 @@ list_ele_t *merge(list_ele_t *left, list_ele_t *right)
     while (left != NULL && right != NULL) {
         if (strcmp(left->value, right->value) < 0) {
             curr->next = left;
+            curr = curr->next;
             left = left->next;
         } else {
             curr->next = right;
+            curr = curr->next;
             right = right->next;
         }
     }
